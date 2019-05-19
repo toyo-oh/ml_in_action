@@ -1,0 +1,29 @@
+git 入门笔记
+
+1.git几个基本概念
+  - a工作区：作业的当前目录(文件修改，编辑在这里)
+  - b暂存区（stage）：经过git add提交后，修改存到b
+  - c分支（默认master）：经过git commit提交后，修改存到c
+  - d远程仓库（默认origin）：github的repository
+ 
+  初始化一个本地目录成为git的本地仓库(git init)后，
+  每个git本地仓库目录下，都有.git隐藏文件夹，即是git的版本库
+  git的版本库存储许多重要的东西，包括暂存区stage及git为我们创建的第一个分支master
+  git通过记录每次提交的改变（并非文件）来管理版本
+
+  工作流程：
+  工作区   ->   暂存区   ->   分支   ->   远程仓库
+       git add     git commit   git push
+
+2.git命令
+  git init    ->  初始化文件夹为本地仓库
+  git add .   ->  提交到暂存区
+  git commit -m "log"  -> 提交到本地分支
+  git push -u origin master(-u第一次push时，origin为默认github上的仓库名，master为本地仓库名)  -> 推送到远程仓库
+  git clone git@github.com:user/xxx.git  从远程仓库克隆（将github上建好的仓库同步到本地）
+  git remote add origin git@github.com:user/xxx.git  将本地仓库添加到远程仓库（用于本地已有项目时，后在github创建远程仓库将本地的添加上）
+
+
+
+
+
