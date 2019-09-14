@@ -1,0 +1,40 @@
+
+♦️关于本地python环境和anaconda的python环境
+mac
+1，本地环境自带有python2.7，python2将要停止维护，一般不用了
+2，在mac上自己再安装python3环境，安装默认路径在：/Library/Frameworks/Python.framework/Versions/3.5
+
+anaconda
+1，anaconda是一个开源的python版本，包含了python等180多个科学计算包及其依赖，因此推荐用于机器学习开发。
+2，conda是anaconda下管理开源包和环境的工具，就如以下常用命令中，都以conda来执行管理。
+3，默认环境自带的base：例如anaconda软件版本是anaconda3，base就指向anaconda3自带的基础环境，包含最初所有anaconda自带的包。
+4，自定义的环境：例如可以同时管理多个不同版本的python环境，让2.7,3.5,3.6环境共存，且随时切换
+anaconda的安装路径默认在：/User/wangfeng/anaconda3
+5，安装anaconda之后，系统的环境变量会被设置，则mac中默认的python环境为启动anaconda环境中的。
+
+参考：https://blog.csdn.net/u010692239/article/details/52701626
+
+
+♦️Anaconda 环境的常用命令
+创建环境 conda create -n py36 python=3.6 （创建python=3.6版本的环境，取名叫py36）
+删除环境 conda remove --name xxx --all （删除一个已有的环境）
+切换环境 source activate py36（py36是个环境名）
+退出环境 source deactivate
+
+查看环境 conda env list
+查看包  conda list
+删除包  conda remove xxx(卸载的包名)
+安装包  conda install xxx(安装的包名）
+若直接用conda命令执行不成功，接着尝试用pip来安装
+安装步骤，a切换到需要安装的anaconda环境中，b再执行pip3 install xxx（安装的包名）
+*直接mac终端执行安装pip3 install xxx（安装的包名），会默认安装到本地mac环境中，anaconda中不会有。
+
+
+♦️其他查找问题的技巧
+多个环境下查看当前使用的是哪个环境的python，用以下命令：
+import sys
+print('\n'.join(sys.path))
+
+
+♦️jupyter notebook和安装好的anaconda的关联
+建立kernel -> 待补充
