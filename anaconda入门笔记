@@ -25,8 +25,9 @@ anaconda的安装路径默认在：/User/wangfeng/anaconda3
 查看包  conda list
 删除包  conda remove xxx(卸载的包名)
 安装包  conda install xxx(安装的包名）
+更新包  conda update xxx(要更新的包名)
 若直接用conda命令执行不成功，接着尝试用pip来安装
-安装步骤，a切换到需要安装的anaconda环境中，b再执行pip3 install xxx（安装的包名）
+安装步骤，1.切换到需要安装的anaconda环境中，2.再执行pip3 install xxx（安装的包名）
 *直接mac终端执行安装pip3 install xxx（安装的包名），会默认安装到本地mac环境中，anaconda中不会有。
 
 
@@ -36,5 +37,21 @@ import sys
 print('\n'.join(sys.path))
 
 
-♦️jupyter notebook和安装好的anaconda的关联
+♦️jupyter中添加conda环境 =>jupyter notebook和安装好的anaconda的关联
 建立kernel -> 待补充
+
+
+♦️好用的Jupyter Notebook插件介绍
+https://www.jiqizhixin.com/articles/2018-12-20-12
+
+
+♦️错误解决
+1, EnvironmentLocationNotFound: Not a conda environment: /anaconda3/envs/anaconda3
+参考：https://codeday.me/bug/20190408/916126.html
+
+2，Jupyter Notebook Nbextensions常用扩展及标签不显示
+ ①先pip卸载当前环境中的nbextensions：
+  pip uninstall jupyter_contrib_nbextensions
+  pip uninstall jupyter_nbextensions_configurator
+ ②再执行如下命令：（可能是包依赖问题导致）
+  conda install -c conda-forge jupyter_contrib_nbextensions
