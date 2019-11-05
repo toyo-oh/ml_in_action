@@ -1,0 +1,5 @@
+Ensemble learning集成学习算法
+
+1，Bootstrap
+2，Bagging（Bootstrap Aggregating）
+3，Boosting 增强算法：弱分类器→强分类器
