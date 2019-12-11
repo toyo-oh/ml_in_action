@@ -1,0 +1,14 @@
+1.推荐系统基础知识
+ 项亮《推荐系统实践》
+ 《Recommender Systems An introduction》
+
+
+2.推荐系统论文进阶
+  github浅梦 https://github.com/shenweichen/DeepCTR
+  知乎王喆 https://www.zhihu.com/people/wang-zhe-58/posts
+
+
+3.推荐相关竞赛
+ 各大比赛的top解决方案开源 https://github.com/Smilexuhc/Data-Competition-TopSolution，
+ kaggle（推荐看国外大佬的kernel）、天池、DataFountain、DataCastle等，
+ 还可以通过https://www.datascicamp.com/?sub=DM,CV,NLP,RL,SP进行查询
