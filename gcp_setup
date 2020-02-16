@@ -24,13 +24,21 @@ The steps of Setting up ML/DL environment in GCP
   - Service account（服务账户）：默认选项（Compute Engine default service account）
   - Access scopes（存取范围）默认选项（Allow default access）
   - Firewall（防火墙），允许两种通信方式（Http／Https），即都勾选
- 
+
+  补充：若创建实例后发现磁盘空间不足，可以调整磁盘大小：https://cloud.google.com/compute/docs/disks/add-persistent-disk?hl=zh-cn#resize_partitions
+  1）先在实例中修改磁盘大小
+  2）然后命令行调整文件系统大小：sudo resize2fs /dev/[DEVICE_ID][PARTITION_NUMBER]
+    执行后需要重新连接VM，确认是否生效
+  3）另外辅助的命令有：
+     - 查看当前分区信息：sudo df -h
+     - 以及命令：sudo lsblk
   
  3.SSH连接到实例instance-1
    方式1:直接在网页GCP的实例列表中，点击当前实例的「SSH」按钮，这时以默认的gmail账户作为用户连接，这是个管理员账户
         在安装ML／DL环境以及各种驱动时，尽量用这个账户登录，以防止没有管理员权限一些环境变量不能生效。
 
    方式2:在本地机器中安装gcloud skd，则可以通过以下命令建立连接
+        gcloud命令使用参考：https://cloud.google.com/compute/docs/gcloud-compute/#default-properties
    ①第一次：gcloud compute ssh --project lustrous-camera-267702 --zone asia-northeast1-a instance-1
     以及第一次会生成SSH连接的公钥和私钥存在本地中，默认选YES生成
     
@@ -56,12 +64,13 @@ The steps of Setting up ML/DL environment in GCP
   b.安装 jupyter notebook：
     1）conda install jupyter
     2）配置通过本地环境访问云虚拟机的jupyter notebook：
-       - 生成jupyter notebook的配置文件： vim /home/用户名/.jupyter/jupyter_notebook_config.py
-       - vim打开配置文件：按A编辑，输入以下配置：
+       - 生成jupyter notebook的配置文件： jupyter notebook --generate-config
+       - vim打开配置文件：vim /home/用户名/.jupyter/jupyter_notebook_config.py
+       - 按A编辑，输入以下配置：
          c.NotebookApp.ip = '*'
          c.NotebookApp.port = 8888
          c.NotebookApp.open_browser = False
-         按Esc进入vim编辑器的命令模式，输入:wq后enter，保存并退出。
+       - 按Esc进入vim编辑器的命令模式，输入:wq后enter，保存并退出
 
     3）开放实例中jupyter notebook的端口（因为默认GCP实例的8888端口是关闭的, 不能进行远程连接）
       
@@ -116,14 +125,16 @@ The steps of Setting up ML/DL environment in GCP
 
   c. 安装TensorFlow
 
-    1)据官网中的描述,1.15以前的版本CPU和GPU版的tensorflow包时分开安装，1.15后的只需要安装一个包：
-    Pip package
-    pip install tensorflow  # stable
-    pip install tf-nightly  # preview
+    1)据官网中的描述：https://www.tensorflow.org/install/gpu
 
-   Older versions of TensorFlow.For releases 1.15 and older, CPU and GPU packages are separate:
-   pip install tensorflow==1.15      # CPU
-   pip install tensorflow-gpu==1.15  # GPU
+    1.15以前的版本CPU和GPU版的tensorflow包时分开安装，1.15后的只需要安装一个包：
+     Pip package
+     pip install tensorflow  # stable
+     pip install tf-nightly  # preview
+
+     Older versions of TensorFlow.For releases 1.15 and older, CPU and GPU packages are separate:
+     pip install tensorflow==1.15      # CPU
+     pip install tensorflow-gpu==1.15  # GPU
 
    b)因此执行安装命令：
    conda install tensorflow
@@ -131,7 +142,17 @@ The steps of Setting up ML/DL environment in GCP
 
   d. 启动远程VM的jupyter notebook测试
      创建测试代码看GPU是否能用：https://www.tensorflow.org/api_docs/python/tf/test/is_gpu_available
-  
+
+
+6.参考链接：
+  Vm整体配置流程参考：https://www.jianshu.com/p/893d622d1b5a
+  jupyter notebook开放远程连接的配置部分参考：https://blog.csdn.net/weixin_42561002/article/details/85653417
+  其他补充事项参考1：https://medium.com/@kstseng/%E5%9C%A8-google-cloud-platform-%E4%B8%8A%E4%BD%BF%E7%94%A8-gpu-%E5%92%8C%E5%AE%89%E8%A3%9D%E6%B7%B1%E5%BA%A6%E5%AD%B8%E7%BF%92%E7%9B%B8%E9%97%9C%E5%A5%97%E4%BB%B6-1b118e291015
+  其他补充事项参考2:https://www.boxdiary.com/diary/248.html
+
+
+7.待补充：
+  还可以直接申请已配置好TensorFlow环境的产品：AISE TensorFlow NVidia GPU Notebook
 
 
 
