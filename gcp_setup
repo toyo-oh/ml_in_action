@@ -1,0 +1,139 @@
+Google Cloud Platform(https://cloud.google.com/)
+
+The steps of Setting up ML/DL environment in GCP
+
+1. 调整配额，将默认账户下GPU为0个调整为1或更多
+   从GCP主页 -> 控制台（Console)
+   进入菜单项：IAM&管理（IAM&admin) -> 配额（Quotas）
+   选择区域为：所有区域（All locations), 筛选GPU产品,选中Compute Engine API的NVIDIA GPU产品，申请配额从0->1
+ 
+   ※注意项：要事先确定下，之后配置的实例的所在区域是否有对应的GPU产品以及GPU使用价格：https://cloud.google.com/compute/docs/gpus/?hl=zh-cn
+   例如：东京地区为asia-northeast1-a，可以选的GPU有 NVIDIA Tesla T4
+
+
+2.创建实例（VM）
+  进入菜单：Compute Engine -> VM实例 -> 创建实例
+  可参考以下配置完成创建（instance-1）
+  - Region：asia-northeast1
+  - Zone：asia-northeast1-a
+  - CPU：自定义（4 Cores + 16G Memory）
+  - GPU：配额中申请过的GPU产品（NVIDIA Tesla T4 * 1个）
+  - CPU Platform：默认选项（Intel Broadwell or later）
+  - Container（Deploy a container image to this VM instance 不选）
+  - Boot disk：OS images：Ubuntu 16.04 LTS／50G磁盘
+  - Service account（服务账户）：默认选项（Compute Engine default service account）
+  - Access scopes（存取范围）默认选项（Allow default access）
+  - Firewall（防火墙），允许两种通信方式（Http／Https），即都勾选
+ 
+  
+ 3.SSH连接到实例instance-1
+   方式1:直接在网页GCP的实例列表中，点击当前实例的「SSH」按钮，这时以默认的gmail账户作为用户连接，这是个管理员账户
+        在安装ML／DL环境以及各种驱动时，尽量用这个账户登录，以防止没有管理员权限一些环境变量不能生效。
+
+   方式2:在本地机器中安装gcloud skd，则可以通过以下命令建立连接
+   ①第一次：gcloud compute ssh --project lustrous-camera-267702 --zone asia-northeast1-a instance-1
+    以及第一次会生成SSH连接的公钥和私钥存在本地中，默认选YES生成
+    
+    设置默认 Compute Engine 地区和默认项目:
+    gcloud config set compute/zone asia-northeast1-a
+    gcloud config set project lustrous-camera-267702
+
+   ②第二次以后：gcloud compute ssh instance-1
+    
+
+4.配置ML／DL的基本环境
+  a.安装Anaconda：
+    ※Anaconda Download Link: https://repo.anaconda.com/archive/Anaconda3-2019.10-Linux-x86_64.sh
+    1）命令行下载安装包: wget https://repo.anaconda.com/archive/Anaconda3-2019.10-Linux-x86_64.sh
+    2）命令行安装Anaconda: bash Anaconda3-2019.10-Linux-x86_64.sh
+       询问是否添加Anaconda的路径到环境变量PATH中，要回答yes。
+    3）更新环境变量PATH，输入命令并运行：source ~/.bashrc
+    4）测试是否安装成功：输入命令：python，若显示Python 3.6.5 |Anaconda, Inc，则表明安装Anaconda成功
+    5）创建虚拟环境: 需要创建虚拟环境的原因是以后不同的开发项目可能需要不同的python环境, 比如这里跑tensorflow-gpu的话最好用python 3.6, 
+       -创建python版本为3.6的虚拟环境：conda create --name py36 python=3.6 anaconda
+       -激活环境：source activate py36
+
+  b.安装 jupyter notebook：
+    1）conda install jupyter
+    2）配置通过本地环境访问云虚拟机的jupyter notebook：
+       - 生成jupyter notebook的配置文件： vim /home/用户名/.jupyter/jupyter_notebook_config.py
+       - vim打开配置文件：按A编辑，输入以下配置：
+         c.NotebookApp.ip = '*'
+         c.NotebookApp.port = 8888
+         c.NotebookApp.open_browser = False
+         按Esc进入vim编辑器的命令模式，输入:wq后enter，保存并退出。
+
+    3）开放实例中jupyter notebook的端口（因为默认GCP实例的8888端口是关闭的, 不能进行远程连接）
+      
+      - 创建防火墙规则：
+        更改步骤为：
+        进入菜单项：vpc网络 -> 防火墙规则 -> 创建防火墙规则:
+        名称（例如：boom）, 优先级1, 目标: 网络中的所有实例, ip地址范围: 0.0.0.0/0, 协议和端口: 全部允许. 其他选项默认
+      - 把规则定义到实例中：
+        进入菜单：Compute Engine -> VM实例进 -> 进入VM实例详情 -> 修改, 在网络标记添加一个「boom」
+　　　　
+　　 4）测试连接到instance-1的jupyter notebook
+       SSH终端中输入 jupyter notebook 启动
+       本地浏览器中输入： xx.xx.xx.xx:8888 (实例中的外部IP) 
+    
+5.安装TensorFlow及配置gpu启动TensorFlow
+  a. 安装内容为：NVIDIA driver, CUDA, cudnn
+  b. 参考TensorFlow官网中GPU Support部分：https://www.tensorflow.org/install/gpu「Ubuntu 16.04 (CUDA 10.1)」
+   
+    # Add NVIDIA package repositories
+    # Add HTTPS support for apt-key
+    sudo apt-get update（为了gnupg-curl被成功安装，可以尝试执行此句）
+    sudo apt-get install gnupg-curl
+    wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/cuda-repo-ubuntu1604_10.1.243-1_amd64.deb
+    sudo dpkg -i cuda-repo-ubuntu1604_10.1.243-1_amd64.deb
+    sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/7fa2af80.pub
+    sudo apt-get update
+    wget http://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1604/x86_64/nvidia-machine-learning-repo-ubuntu1604_1.0.0-1_amd64.deb
+    sudo apt install ./nvidia-machine-learning-repo-ubuntu1604_1.0.0-1_amd64.deb
+    sudo apt-get update
+
+    # Install NVIDIA driver
+    # Issue with driver install requires creating /usr/lib/nvidia
+    sudo mkdir /usr/lib/nvidia
+    sudo apt-get install --no-install-recommends nvidia-418
+    这里之后要执行命令（sudo reboot重启虚拟机，让驱动安装生效）
+    # Reboot. Check that GPUs are visible using the command: nvidia-smi
+    安装是否成功的测试命令：nvidia-smi，成功则输出nvidia驱动的信息
+
+    # Install development and runtime libraries (~4GB)
+    sudo apt-get install --no-install-recommends \
+      cuda-10-1 \
+      libcudnn7=7.6.4.38-1+cuda10.1  \
+      libcudnn7-dev=7.6.4.38-1+cuda10.1
+
+
+    # Install TensorRT. Requires that libcudnn7 is installed above.
+    sudo apt-get install -y --no-install-recommends \
+      libnvinfer6=6.0.1-1+cuda10.1 \
+      libnvinfer-dev=6.0.1-1+cuda10.1 \
+      libnvinfer-plugin6=6.0.1-1+cuda10.1
+
+
+  c. 安装TensorFlow
+
+    1)据官网中的描述,1.15以前的版本CPU和GPU版的tensorflow包时分开安装，1.15后的只需要安装一个包：
+    Pip package
+    pip install tensorflow  # stable
+    pip install tf-nightly  # preview
+
+   Older versions of TensorFlow.For releases 1.15 and older, CPU and GPU packages are separate:
+   pip install tensorflow==1.15      # CPU
+   pip install tensorflow-gpu==1.15  # GPU
+
+   b)因此执行安装命令：
+   conda install tensorflow
+
+
+  d. 启动远程VM的jupyter notebook测试
+     创建测试代码看GPU是否能用：https://www.tensorflow.org/api_docs/python/tf/test/is_gpu_available
+  
+
+
+
+
+
